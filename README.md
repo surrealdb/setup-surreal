@@ -47,4 +47,4 @@ jobs:
 
 ## License
 
-TODO: Add license
+This GitHub Action is released under the [Apache License 2.0](https://github.com/surrealdb/license/blob/main/APL.txt).
