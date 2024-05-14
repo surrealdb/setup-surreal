@@ -13,9 +13,9 @@ you provide a value for them.
 | Argument | Description                   | Default | Value                                            |
 | -------- | ----------------------------- | ------- | ------------------------------------------------ |
 | VERSION  | SurrealDB version to use      | latest  | `latest`, `v1.x.x`                               |
-| PORT     | Port to run SurrealDB on      | 8000    | `any number`                                     |
-| USER     | Username to use for SurrealDB |         | `up to the user`                                 |
-| PASSWORD | Password to use for SurrealDB |         | `up to the user`                                 |
+| PORT     | Port to run SurrealDB on      | 8000    | Valid number from `0` to `65535`                 |
+| USERNAME | Username to use for SurrealDB |         | Customisable by the user                         |
+| PASSWORD | Password to use for SurrealDB |         | Customisable by the user                         |
 | AUTH     | Enable authentication         |         | `true`, `false`                                  |
 | STRICT   | Enable strict mode            |         | `true`, `false`                                  |
 | LOG      | Enable logs                   |         | `none`, `full`, `warn`, `info`, `debug`, `trace` |
