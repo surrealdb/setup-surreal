@@ -1,0 +1,45 @@
+name: "SurrealDB in Github Actions"
+description: "Start a SurrealDB instance in Github Actions"
+
+branding:
+  icon: "database"
+  color: "purple"
+
+inputs:
+  surrealdb_version:
+    description: "The version of SurrealDB to use, default is latest"
+    required: false
+    default: "latest"
+  surrealdb_port:
+    description: "The port to run SurrealDB on, default is 8000"
+    required: false
+    default: "8000"
+  surrealdb_username:
+    description: "The username to use for SurrealDB"
+    required: false
+  surrealdb_password:
+    description: "The password to use for SurrealDB"
+    required: false
+  surrealdb_auth:
+    description: "Enable authentication for SurrealDB"
+    required: false
+    default: "false"
+  surrealdb_strict:
+    description: "Enable strict mode for SurrealDB"
+    required: false
+    default: "false"
+  surrealdb_log:
+    description: "Enable logs printed out in the console."
+    required: false
+  
+runs:
+ using: "docker"
+ image: "DockerFile"
+ args:
+ - ${{ inputs.surrealdb-version }}
+ - ${{ inputs.surrealdb-port }}
+ - ${{ inputs.surrealdb-username }}
+ - ${{ inputs.surrealdb-password }}
+ - ${{ inputs.surrealdb-auth }}
+ - ${{ inputs.surrealdb-strict }}
+ - ${{ inputs.surrealdb-log }}
