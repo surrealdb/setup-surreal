@@ -42,7 +42,7 @@ jobs:
         PASSWORD: root
         AUTH: false
         STRICT: false
-		LOG: info
+        LOG: info
 ```
 
 ## License
