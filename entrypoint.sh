@@ -25,7 +25,7 @@ fi
 if [ -z "$PASSWORD" ]; then
 	PASSWORD=""
 else
-	PASSWORD="--password $PASSWORD"
+	PASSWORD="--pass $PASSWORD"
 fi
 
 if [ "$AUTH" = "true" ]; then
