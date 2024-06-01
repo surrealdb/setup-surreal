@@ -4,21 +4,21 @@ Github CI integration for SurrealDB using Github Actions.
 
 ## Arguments
 
-Here you see an overview of arguments you can use with setup-surreal action. In the
-column `Default` you can see the default value of the argument. If you don't
+Here you see an overview of arguments you can use with setup-surreal action. In
+the column `Default` you can see the default value of the argument. If you don't
 provide a value for an argument, the default value will be used. But for those
 arguments that don't have a default value are optional and are not used unless
 you provide a value for them.
 
-| Argument | Description                   | Default | Value                                            |
-| -------- | ----------------------------- | ------- | ------------------------------------------------ |
-| VERSION  | SurrealDB version to use      | latest  | `latest`, `v1.x.x`                               |
-| PORT     | Port to run SurrealDB on      | 8000    | Valid number from `0` to `65535`                 |
-| USERNAME | Username to use for SurrealDB |         | Customisable by the user                         |
-| PASSWORD | Password to use for SurrealDB |         | Customisable by the user                         |
-| AUTH     | Enable authentication         |         | `true`, `false`                                  |
-| STRICT   | Enable strict mode            |         | `true`, `false`                                  |
-| LOG      | Enable logs                   |         | `none`, `full`, `warn`, `info`, `debug`, `trace` |
+| Argument           | Description                   | Default | Value                                            |
+| ------------------ | ----------------------------- | ------- | ------------------------------------------------ |
+| surrealdb_version  | SurrealDB version to use      | latest  | `latest`, `v1.x.x`                               |
+| surrealdb_port     | Port to run SurrealDB on      | 8000    | Valid number from `0` to `65535`                 |
+| surrealdb_username | Username to use for SurrealDB |         | Customisable by the user                         |
+| surrealdb_password | Password to use for SurrealDB |         | Customisable by the user                         |
+| surrealdb_auth     | Enable authentication         |         | `true`, `false`                                  |
+| surrealdb_strict   | Enable strict mode            |         | `true`, `false`                                  |
+| surrealdb_log      | Enable logs                   |         | `none`, `full`, `warn`, `info`, `debug`, `trace` |
 
 ## Usage
 
@@ -36,15 +36,16 @@ jobs:
     - name: Start SurrealDB
       uses: surrealdb/setup-surreal@v1
       with:
-        VERSION: latest
-        PORT: 8000
-        USERNAME: root
-        PASSWORD: root
-        AUTH: false
-        STRICT: false
-        LOG: info
+        surrealdb_version: latest
+        surrealdb_port: 8000
+        surrealdb_username: root
+        surrealdb_password: root
+        surrealdb_auth: false
+        surrealdb_strict: false
+        surrealdb_log: info
 ```
 
 ## License
 
-This GitHub Action is released under the [Apache License 2.0](https://github.com/surrealdb/license/blob/main/APL.txt).
+This GitHub Action is released under the
+[Apache License 2.0](https://github.com/surrealdb/license/blob/main/APL.txt).

@@ -8,24 +8,24 @@ AUTH=$5 			# Enable or disable authentication, default is not provided
 STRICT=$6 			# Enable or disable strict mode, default is not provided
 LOG=$7 				# Setting logging, default is not provided. SurrealDB sets logging to `info` by default
 
-if [ -z "$VERSION"]; then
+if [ -z "$VERSION" ]; then
 	VERSION="latest"
 fi
 
-if [ -z "$PORT"]; then
+if [ -z "$PORT" ]; then
 	PORT="8000"
 fi
 
-if [ -z "$USERNAME"]; then
+if [ -z "$USERNAME" ]; then
 	USERNAME=""
 else
 	USERNAME="--user $USERNAME"
 fi
 
-if [ -z "$PASSWORD"]; then
+if [ -z "$PASSWORD" ]; then
 	PASSWORD=""
 else
-	PASSWORD="--password $PASSWORD"
+	PASSWORD="--pass $PASSWORD"
 fi
 
 if [ "$AUTH" = "true" ]; then
@@ -40,7 +40,7 @@ else
 	STRICT=""
 fi
 
-if [ -z "$LOG"]; then
+if [ -z "$LOG" ]; then
 	LOG=""
 else
 	LOG="--log $LOG"
