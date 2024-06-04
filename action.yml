@@ -36,10 +36,10 @@ runs:
  using: "docker"
  image: "DockerFile"
  args:
- - ${{ inputs.surrealdb-version }}
- - ${{ inputs.surrealdb-port }}
- - ${{ inputs.surrealdb-username }}
- - ${{ inputs.surrealdb-password }}
- - ${{ inputs.surrealdb-auth }}
- - ${{ inputs.surrealdb-strict }}
- - ${{ inputs.surrealdb-log }}
+ - ${{ inputs.surrealdb_version }}
+ - ${{ inputs.surrealdb_port }}
+ - ${{ inputs.surrealdb_username }}
+ - ${{ inputs.surrealdb_password }}
+ - ${{ inputs.surrealdb_auth }}
+ - ${{ inputs.surrealdb_strict }}
+ - ${{ inputs.surrealdb_log }}
