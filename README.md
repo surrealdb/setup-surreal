@@ -10,15 +10,16 @@ provide a value for an argument, the default value will be used. But for those
 arguments that don't have a default value are optional and are not used unless
 you provide a value for them.
 
-| Argument           | Description                   | Default | Value                                            |
-| ------------------ | ----------------------------- | ------- | ------------------------------------------------ |
-| surrealdb_version  | SurrealDB version to use      | latest  | `latest`, `v1.x.x`                               |
-| surrealdb_port     | Port to run SurrealDB on      | 8000    | Valid number from `0` to `65535`                 |
-| surrealdb_username | Username to use for SurrealDB |         | Customisable by the user                         |
-| surrealdb_password | Password to use for SurrealDB |         | Customisable by the user                         |
-| surrealdb_auth     | Enable authentication         |         | `true`, `false`                                  |
-| surrealdb_strict   | Enable strict mode            |         | `true`, `false`                                  |
-| surrealdb_log      | Enable logs                   |         | `none`, `full`, `warn`, `info`, `debug`, `trace` |
+| Argument                  | Description                        | Default | Value                                                                                |
+| ------------------------- | ---------------------------------- | ------- | ------------------------------------------------------------------------------------ |
+| surrealdb_version         | SurrealDB version to use           | latest  | `latest`, `v1.x.x`                                                                   |
+| surrealdb_port            | Port to run SurrealDB on           | 8000    | Valid number from `0` to `65535`                                                     |
+| surrealdb_username        | Username to use for SurrealDB      |         | Customisable by the user                                                             |
+| surrealdb_password        | Password to use for SurrealDB      |         | Customisable by the user                                                             |
+| surrealdb_auth            | Enable authentication              |         | `true`, `false`                                                                      |
+| surrealdb_strict          | Enable strict mode                 |         | `true`, `false`                                                                      |
+| surrealdb_log             | Enable logs                        |         | `none`, `full`, `warn`, `info`, `debug`, `trace`                                     |
+| surrealdb_additional_args | Additional arguments for SurrealDB |         | [Any valid SurrealDB CLI arguments](https://surrealdb.com/docs/surrealdb/cli/start#) |
 
 ## Usage
 
@@ -43,6 +44,7 @@ jobs:
         surrealdb_auth: false
         surrealdb_strict: false
         surrealdb_log: info
+		surrealdb_additional_args: --allow-all
 ```
 
 ## License
