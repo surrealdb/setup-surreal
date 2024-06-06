@@ -7,6 +7,7 @@ PASSWORD=$4 		# Password to access for root user, default is not provided
 AUTH=$5 			# Enable or disable authentication, default is not provided
 STRICT=$6 			# Enable or disable strict mode, default is not provided
 LOG=$7 				# Setting logging, default is not provided. SurrealDB sets logging to `info` by default
+ADDITIONAL=$8 		# Additional arguments to pass to the SurrealDB service
 
 if [ -z "$VERSION" ]; then
 	VERSION="latest"
@@ -46,7 +47,11 @@ else
 	LOG="--log $LOG"
 fi
 
+if [ -z "$ADDITIONAL" ]; then
+	ADDITIONAL=""
+fi
+
 echo "SurrealDB version: $VERSION - Port: $PORT"
 
 docker pull surrealdb/surrealdb:$VERSION
-docker run --name surrealdb --publish $PORT:8000 --detach surrealdb/surrealdb:$VERSION start $USERNAME $PASSWORD $AUTH $STRICT $LOG
+docker run --name surrealdb --publish $PORT:8000 --detach surrealdb/surrealdb:$VERSION start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL

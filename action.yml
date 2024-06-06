@@ -31,6 +31,9 @@ inputs:
   surrealdb_log:
     description: "Enable logs printed out in the console."
     required: false
+  surrealdb_additional_args:
+    description: "Additional arguments to pass to SurrealDB"
+    required: false
   
 runs:
  using: "docker"
@@ -43,3 +46,4 @@ runs:
  - ${{ inputs.surrealdb_auth }}
  - ${{ inputs.surrealdb_strict }}
  - ${{ inputs.surrealdb_log }}
+ - ${{ inputs.surrealdb_additional_args }}
