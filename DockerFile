@@ -11,6 +11,5 @@ FROM surrealdb/surrealdb:${SURREAL_VERSION}
 EXPOSE $SURREAL_PORT
 
 COPY ./entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
