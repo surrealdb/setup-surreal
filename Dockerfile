@@ -17,4 +17,6 @@ COPY ./entrypoint.sh .
 RUN ls -la
 RUN ls -la /surreal
 
+RUN chmod +x /surreal
+
 ENTRYPOINT ["/entrypoint.sh"]
