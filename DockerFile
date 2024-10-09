@@ -7,14 +7,5 @@ ARG SURREAL_PORT=8000
 # Use the specified version of the SurrealDB Docker image
 FROM surrealdb/surrealdb:${SURREAL_VERSION}
 
-# Copy the entrypoint script to the container
-COPY entrypoint.sh /entrypoint.sh
-
-# Make the entrypoint script executable
-RUN chmod +x /entrypoint.sh
-
 # Expose the default SurrealDB port
 EXPOSE $SURREAL_PORT
-
-# Set the default command to run the entrypoint script
-ENTRYPOINT ["/entrypoint.sh"]
