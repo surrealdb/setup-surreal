@@ -10,6 +10,9 @@ FROM surrealdb/surrealdb:${SURREAL_VERSION}
 # Expose the default SurrealDB port
 EXPOSE $SURREAL_PORT
 
+RUN mkdir /setup-surreal
+WORKDIR /setup-surreal
+
 COPY ./entrypoint.sh .
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/setup-surreal/entrypoint.sh"]
