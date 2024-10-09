@@ -54,4 +54,25 @@ fi
 echo "SurrealDB version: $VERSION - Port: $PORT"
 
 # Start the SurrealDB service with the provided configuration
-surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL
+surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL &
+
+# Wait for the SurrealDB service to start
+
+URL="http://localhost:8000/health"
+MAX_ATTEMPTS=30
+ATTEMPT=0
+
+while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+    RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" $URL)
+    
+    if [ "$RESPONSE" -eq 200 ]; then
+        echo "SurrealDB instance is up and running, continuing..."
+        fg
+    fi
+    
+    ATTEMPT=$((ATTEMPT + 1))
+    sleep 1
+done
+
+echo "SurrealDB instance could not be contacted, aborting."
+exit 1

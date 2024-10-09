@@ -36,7 +36,7 @@ inputs:
     required: false
 runs:
   using: "docker"
-  image: "DockerFile"
+  image: "Dockerfile"
   args:
     - ${{ inputs.surrealdb_version }}
     - ${{ inputs.surrealdb_port }}
