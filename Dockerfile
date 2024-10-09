@@ -6,7 +6,7 @@ ARG SURREAL_PORT=8000
 
 # Use the specified version of the SurrealDB Docker image
 FROM surrealdb/surrealdb:${SURREAL_VERSION} as surreal
-FROM alpine:3.12.12
+FROM alpine/curl:3
 
 # Expose the default SurrealDB port
 EXPOSE $SURREAL_PORT
