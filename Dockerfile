@@ -13,6 +13,6 @@ WORKDIR /surreal
 # Expose the default SurrealDB port
 EXPOSE $SURREAL_PORT
 
-COPY ./entrypoint.sh ./entrypoint.sh
+COPY ./entrypoint.sh .
 
 ENTRYPOINT ["/surreal/entrypoint.sh"]
