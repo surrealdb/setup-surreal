@@ -52,10 +52,6 @@ if [ -z "$ADDITIONAL" ]; then
 fi
 
 echo "SurrealDB version: $VERSION - Port: $PORT"
-echo "$(pwd)"
-
-ls -la
-ls -la /
 
 # Start the SurrealDB service with the provided configuration
 nohup /surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL &
