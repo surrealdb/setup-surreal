@@ -5,7 +5,7 @@ ARG SURREAL_VERSION=latest
 ARG SURREAL_PORT=8000
 
 # Use the specified version of the SurrealDB Docker image
-FROM surrealdb/surrealdb:${SURREALDB_VERSION}
+FROM surrealdb/surrealdb:${SURREAL_VERSION}
 
 # Copy the entrypoint script to the container
 COPY entrypoint.sh /entrypoint.sh
