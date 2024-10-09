@@ -5,14 +5,13 @@ ARG SURREAL_VERSION=latest
 ARG SURREAL_PORT=8000
 
 # Use the specified version of the SurrealDB Docker image
-FROM surrealdb/surrealdb:${SURREAL_VERSION}
+FROM surrealdb/surrealdb:${SURREAL_VERSION} as surreal
+FROM alpine:3.12.12
 
 # Expose the default SurrealDB port
 EXPOSE $SURREAL_PORT
 
-RUN mkdir /setup-surreal
-WORKDIR /setup-surreal
-
+COPY --from=surreal /surreal .
 COPY ./entrypoint.sh .
 
-ENTRYPOINT ["/setup-surreal/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]

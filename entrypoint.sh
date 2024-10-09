@@ -54,7 +54,7 @@ fi
 echo "SurrealDB version: $VERSION - Port: $PORT"
 
 # Start the SurrealDB service with the provided configuration
-surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL &
+/surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL &
 
 # Wait for the SurrealDB service to start
 
