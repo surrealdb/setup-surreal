@@ -12,4 +12,4 @@ EXPOSE $SURREAL_PORT
 
 COPY ./entrypoint.sh .
 
-ENTRYPOINT ["/surreal/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
