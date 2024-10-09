@@ -60,6 +60,9 @@ ls -la /
 # Start the SurrealDB service with the provided configuration
 nohup /surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL &
 
+# Save the PID of the SurrealDB service
+echo $! > /tmp/surreal.pid
+
 # Wait for the SurrealDB service to start
 
 URL="http://localhost:8000/health"

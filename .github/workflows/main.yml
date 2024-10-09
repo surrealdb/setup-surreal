@@ -19,5 +19,13 @@ jobs:
       - name: Use Action
         uses: ./
 
+      - name: Check background task is running
+        run: |
+          if ps -p $(cat /tmp/surreal.pid) > /dev/null; then
+            echo "SurrealDB service is running."
+          else
+            echo "SurrealDB service is not running."
+          fi
+
       - name: Retrieve SurrealDB version
         run: curl http://127.0.0.1:8000/version
