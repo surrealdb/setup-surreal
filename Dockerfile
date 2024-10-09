@@ -14,4 +14,7 @@ EXPOSE $SURREAL_PORT
 COPY --from=surreal /surreal .
 COPY ./entrypoint.sh .
 
+RUN ls -la
+RUN ls -la /surreal
+
 ENTRYPOINT ["/entrypoint.sh"]
