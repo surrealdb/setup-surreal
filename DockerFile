@@ -9,3 +9,8 @@ FROM surrealdb/surrealdb:${SURREAL_VERSION}
 
 # Expose the default SurrealDB port
 EXPOSE $SURREAL_PORT
+
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
