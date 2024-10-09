@@ -53,5 +53,5 @@ fi
 
 echo "SurrealDB version: $VERSION - Port: $PORT"
 
-docker pull surrealdb/surrealdb:$VERSION
-docker run --name surrealdb --publish $PORT:8000 --detach surrealdb/surrealdb:$VERSION start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL
+# Start the SurrealDB service with the provided configuration
+surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL
