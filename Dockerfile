@@ -6,10 +6,7 @@ ARG SURREAL_PORT=8000
 
 # Use the specified version of the SurrealDB Docker image
 FROM surrealdb/surrealdb:${SURREAL_VERSION} as surreal
-FROM alpine:3
-
-RUN apk add --no-cache bash
-RUN apk add --no-cache curl
+FROM ubuntu:latest
 
 # Expose the default SurrealDB port
 EXPOSE $SURREAL_PORT
