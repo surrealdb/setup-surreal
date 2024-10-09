@@ -58,7 +58,7 @@ ls -la
 ls -la /
 
 # Start the SurrealDB service with the provided configuration
-nohup /surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL
+nohup /surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL &
 
 # Wait for the SurrealDB service to start
 
