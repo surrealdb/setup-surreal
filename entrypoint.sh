@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 VERSION=$1 			# Can be latest or a specific version starting at 1.x.x, default is latest
 PORT=$2 			# Port to expose the SurrealDB service, default is 8000
