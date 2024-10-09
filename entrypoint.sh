@@ -58,7 +58,7 @@ ls -la
 ls -la /
 
 # Start the SurrealDB service with the provided configuration
-/surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL &
+nohub /surreal start $USERNAME $PASSWORD $AUTH $STRICT $LOG $ADDITIONAL
 
 # Wait for the SurrealDB service to start
 
@@ -71,7 +71,7 @@ while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     
     if [ "$RESPONSE" -eq 200 ]; then
         echo "SurrealDB instance is up and running, continuing..."
-        fg
+		exit 0
     fi
     
     ATTEMPT=$((ATTEMPT + 1))
