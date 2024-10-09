@@ -8,6 +8,9 @@ ARG SURREAL_PORT=8000
 FROM surrealdb/surrealdb:${SURREAL_VERSION} as surreal
 FROM ubuntu:latest
 
+RUN apt-get update && apt-get install -y \
+    curl
+
 # Expose the default SurrealDB port
 EXPOSE $SURREAL_PORT
 
