@@ -21,6 +21,8 @@ jobs:
 
       - name: Check background task is running
         run: |
+          echo "$(pwd)"
+          ls -la /tmp
           if ps -p $(cat /tmp/surreal.pid) > /dev/null; then
             echo "SurrealDB service is running."
           else
