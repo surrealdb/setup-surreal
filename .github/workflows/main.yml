@@ -28,6 +28,7 @@ jobs:
 
       - name: Retrieve SurrealDB version
         run: curl http://127.0.0.1:8000/version
+        continue-on-error: true
 
       - name: List out docker containers
         run: docker ps -a
