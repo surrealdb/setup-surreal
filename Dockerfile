@@ -6,6 +6,8 @@ ARG SURREAL_PORT=8000
 
 # Use the specified version of the SurrealDB Docker image
 FROM surrealdb/surrealdb:${SURREAL_VERSION} as surreal
+LABEL name="surrealdb"
+
 FROM ubuntu:latest
 
 RUN apt-get update && apt-get install -y \
