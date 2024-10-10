@@ -70,6 +70,7 @@ while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     
     if [ "$RESPONSE" -eq 200 ]; then
         echo "SurrealDB instance is up and running, continuing..."
+		ls -la /tmp
 		exit 0
     fi
     
