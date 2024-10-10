@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     curl
 
 # Expose the default SurrealDB port
-EXPOSE $SURREAL_PORT:$SURREAL_PORT
+EXPOSE $SURREAL_PORT
 
 COPY --from=surreal /surreal .
 COPY ./entrypoint.sh .

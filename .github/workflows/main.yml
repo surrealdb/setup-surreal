@@ -18,16 +18,14 @@ jobs:
 
       - name: Use Action
         uses: ./
-
-      - name: Check background task is running
-        run: |
-          echo "$(pwd)"
-          ls -la /tmp
-          if ps -p $(cat /tmp/surreal.pid) > /dev/null; then
-            echo "SurrealDB service is running."
-          else
-            echo "SurrealDB service is not running."
-          fi
+        with:
+          surrealdb_version: "v1.5.5"
+          surrealdb_port: "8000"
+          surrealdb_username: "root"
+          surrealdb_password: "root"
+          surrealdb_auth: true
+          surrealdb_strict: true
+          surrealdb_log: "debug"
 
       - name: Retrieve SurrealDB version
         run: curl http://127.0.0.1:8000/version
