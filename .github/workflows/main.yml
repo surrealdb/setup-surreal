@@ -23,7 +23,6 @@ jobs:
           surrealdb_port: "8000"
           surrealdb_username: "root"
           surrealdb_password: "root"
-          surrealdb_auth: "true"
           surrealdb_strict: true
           surrealdb_log: "debug"
 
