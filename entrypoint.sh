@@ -71,12 +71,17 @@ while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
     if [ "$RESPONSE" -eq 200 ]; then
         echo "SurrealDB instance is up and running, continuing..."
 		ls -la /tmp
-		exit 0
+		break
     fi
     
     ATTEMPT=$((ATTEMPT + 1))
     sleep 1
 done
 
-echo "SurrealDB instance could not be contacted, aborting."
-exit 1
+if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
+    echo "SurrealDB instance could not be contacted, aborting."
+    exit 1
+fi
+
+# Keep the container running
+tail -f /dev/null
