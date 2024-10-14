@@ -54,5 +54,37 @@ runs:
   steps:
     - name: Install SurrealDB
       shell: bash
+      run: curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
+
+    - name: Run SurrealDB in Background
+      shell: bash
       run: |
-        curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
+        cd /usr/local/bin
+        nohup surreal start \
+          --u ${{ inputs.surrealdb_username }} \
+          --p ${{ inputs.surrealdb_password }} \
+          --allow-all &
+        
+    - name: Wait for SurrealDB to start
+      shell: bash
+      run: |
+        URL="http://localhost:8000/health"
+        MAX_ATTEMPTS=30
+        ATTEMPT=0
+
+        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" $URL)
+            
+            if [ "$RESPONSE" -eq 200 ]; then
+                echo "SurrealDB instance is up and running, continuing..."
+                break
+            fi
+            
+            ATTEMPT=$((ATTEMPT + 1))
+            sleep 1
+        done
+
+        if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
+            echo "SurrealDB instance could not be contacted, aborting."
+            exit 1
+        fi
