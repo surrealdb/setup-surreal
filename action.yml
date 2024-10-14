@@ -43,19 +43,6 @@ runs:
   using: composite
   steps:
 
-    - name: Set environment variables
-      shell: bash
-      run: |
-        export SURREALDB_VERSION=${{ inputs.surrealdb_version }}
-        export SURREALDB_PORT=${{ inputs.surrealdb_port }}
-        export SURREALDB_USERNAME=${{ inputs.surrealdb_username }}
-        export SURREALDB_PASSWORD=${{ inputs.surrealdb_password }}
-        export SURREALDB_AUTH=${{ inputs.surrealdb_auth }}
-        export SURREALDB_STRICT=${{ inputs.surrealdb_strict }}
-        export SURREALDB_LOG=${{ inputs.surrealdb_log }}
-        export SURREALDB_ADDITIONAL_ARGS=${{ inputs.surrealdb_additional_args }}
-        export SURREALDB_ALLOW_ALL=${{ inputs.surrealdb_allow_all }}
-
     - name: Install SurrealDB
       shell: bash
       run: |
@@ -70,10 +57,20 @@ runs:
       shell: bash
       run: |
 
+        SURREALDB_VERSION="${{ inputs.surrealdb_version }}"
+        SURREALDB_PORT="${{ inputs.surrealdb_port }}"
+        SURREALDB_USERNAME="${{ inputs.surrealdb_username }}"
+        SURREALDB_PASSWORD="${{ inputs.surrealdb_password }}"
+        SURREALDB_AUTH="${{ inputs.surrealdb_auth }}"
+        SURREALDB_STRICT="${{ inputs.surrealdb_strict }}"
+        SURREALDB_LOG="${{ inputs.surrealdb_log }}"
+        SURREALDB_ADDITIONAL_ARGS="${{ inputs.surrealdb_additional_args }}"
+        SURREALDB_ALLOW_ALL="${{ inputs.surrealdb_allow_all }}"
+
         if [ -z "$SURREALDB_USERNAME" ]; then
           SURREALDB_USERNAME="-u root"
         else
-          SURREALDB_USERNAME="-u {{ inputs.surrealdb_username }}"
+          SURREALDB_USERNAME="-u $SURREALDB_USERNAME"
         fi
 
         if [ -z "$SURREALDB_PASSWORD" ]; then
