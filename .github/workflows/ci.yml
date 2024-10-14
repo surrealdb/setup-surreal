@@ -1,0 +1,35 @@
+name: Run Action
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, change/action-improvements]
+  pull_request:
+    branches: [main]
+
+jobs:
+  surrealdb-setup:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        surrealdb_version: ["v1.5.5", "v2.0.4", "latest"]
+
+    name: Run Action
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Action
+        uses: ./
+        with:
+          surrealdb_version: "v1.5.5"
+          surrealdb_port: "8000"
+          surrealdb_username: "root"
+          surrealdb_password: "root"
+          surrealdb_strict: true
+          surrealdb_log: "trace"
+          allow_all: false
+
+      - name: Retrieve SurrealDB version
+        run: curl http://127.0.0.1:8000/version
+        continue-on-error: true

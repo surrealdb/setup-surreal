@@ -34,36 +34,93 @@ inputs:
   surrealdb_additional_args:
     description: "Additional arguments to pass to SurrealDB"
     required: false
-# runs:
-#   using: "docker"
-#   image: "Dockerfile"
-#   args:
-#     - ${{ inputs.surrealdb_version }}
-#     - ${{ inputs.surrealdb_port }}
-#     - ${{ inputs.surrealdb_username }}
-#     - ${{ inputs.surrealdb_password }}
-#     - ${{ inputs.surrealdb_auth }}
-#     - ${{ inputs.surrealdb_strict }}
-#     - ${{ inputs.surrealdb_log }}
-#     - ${{ inputs.surrealdb_additional_args }}
-#   env:
-#     SURREALDB_VERSION: ${{ inputs.surrealdb_version }}
-#     SURREALDB_PORT: ${{ inputs.surrealdb_port }}
+  surrealdb_allow_all:
+    description: "Allow all capabilities except for those more specifically denied"
+    required: false
+    default: "false"
+
 runs:
   using: composite
   steps:
+
+    - name: Set environment variables
+      shell: bash
+      run: |
+        export SURREALDB_VERSION=${{ inputs.surrealdb_version }}
+        export SURREALDB_PORT=${{ inputs.surrealdb_port }}
+        export SURREALDB_USERNAME=${{ inputs.surrealdb_username }}
+        export SURREALDB_PASSWORD=${{ inputs.surrealdb_password }}
+        export SURREALDB_AUTH=${{ inputs.surrealdb_auth }}
+        export SURREALDB_STRICT=${{ inputs.surrealdb_strict }}
+        export SURREALDB_LOG=${{ inputs.surrealdb_log }}
+        export SURREALDB_ADDITIONAL_ARGS=${{ inputs.surrealdb_additional_args }}
+        export SURREALDB_ALLOW_ALL=${{ inputs.surrealdb_allow_all }}
+
     - name: Install SurrealDB
       shell: bash
-      run: curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
+      run: |
+        # Download the SurrealDB binary when the version is not latest
+        if [ "$SURREALDB_VERSION" != "latest" ]; then
+          curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s
+        else
+          curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
+        fi
 
     - name: Run SurrealDB in Background
       shell: bash
       run: |
+
+        if [ -z "$SURREALDB_USERNAME" ]; then
+          SURREALDB_USERNAME="-u root"
+        else
+          SURREALDB_USERNAME="-u $SURREALDB_USERNAME"
+        fi
+
+        if [ "$SURREALDB_PASSWORD" ]; then
+          SURREALDB_PASSWORD="-p $SURREALDB_PASSWORD"
+        fi
+
+        if [[ "$SURREALDB_VERSION" == v1.* ]]; then
+          if [ "$SURREALDB_AUTH" == "true" ]; then
+            SURREALDB_AUTH="--auth"
+          fi
+        fi
+
+        if [[ -z "$SURREALDB_PORT" ]]; then
+          SURREALDB_PORT="--bind 0.0.0.0:8000"
+        else
+          SURREALDB_PORT="--bind 0.0.0.0:$SURREALDB_PORT"
+        fi
+
+        if [ "$SURREALDB_STRICT" == "true" ]; then
+          SURREALDB_STRICT="--strict"
+        fi
+
+        if [ -z "$SURREALDB_LOG" ]; then
+          SURREALDB_LOG="--log trace"
+        else
+          SURREALDB_LOG="--log $SURREALDB_LOG"
+        fi
+
+        if [ -z "$SURREALDB_ADDITIONAL_ARGS" ]; then
+          SURREALDB_ADDITIONAL_ARGS=""
+        fi
+
+        if [ "$SURREALDB_ALLOW_ALL" == "true" ]; then
+          SURREALDB_ALLOW_ALL="--allow-all"
+        fi
+
         cd /usr/local/bin
+        
         nohup surreal start \
-          -u ${{ inputs.surrealdb_username }} \
-          -p ${{ inputs.surrealdb_password }} \
-          --allow-all &
+          $SURREALDB_USERNAME \
+          $SURREALDB_PASSWORD \
+          $SURREALDB_AUTH \
+          $SURREALDB_PORT \
+          $SURREALDB_STRICT \
+          $SURREALDB_LOG \
+          $SURREALDB_ADDITIONAL_ARGS \
+          $SURREALDB_ALLOW_ALL &
         
     - name: Wait for SurrealDB to start
       shell: bash
