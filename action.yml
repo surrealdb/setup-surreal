@@ -73,10 +73,12 @@ runs:
         if [ -z "$SURREALDB_USERNAME" ]; then
           SURREALDB_USERNAME="-u root"
         else
-          SURREALDB_USERNAME="-u $SURREALDB_USERNAME"
+          SURREALDB_USERNAME="-u {{ inputs.surrealdb_username }}"
         fi
 
-        if [ "$SURREALDB_PASSWORD" ]; then
+        if [ -z "$SURREALDB_PASSWORD" ]; then
+          SURREALDB_PASSWORD="-p root"
+        else
           SURREALDB_PASSWORD="-p $SURREALDB_PASSWORD"
         fi
 
@@ -111,16 +113,6 @@ runs:
         fi
 
         cd /usr/local/bin
-
-        echo nohup surreal start \
-          $SURREALDB_USERNAME \
-          $SURREALDB_PASSWORD \
-          $SURREALDB_AUTH \
-          $SURREALDB_PORT \
-          $SURREALDB_STRICT \
-          $SURREALDB_LOG \
-          $SURREALDB_ADDITIONAL_ARGS \
-          $SURREALDB_ALLOW_ALL &
         
         nohup surreal start \
           $SURREALDB_USERNAME \
