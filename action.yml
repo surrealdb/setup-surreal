@@ -34,18 +34,25 @@ inputs:
   surrealdb_additional_args:
     description: "Additional arguments to pass to SurrealDB"
     required: false
+# runs:
+#   using: "docker"
+#   image: "Dockerfile"
+#   args:
+#     - ${{ inputs.surrealdb_version }}
+#     - ${{ inputs.surrealdb_port }}
+#     - ${{ inputs.surrealdb_username }}
+#     - ${{ inputs.surrealdb_password }}
+#     - ${{ inputs.surrealdb_auth }}
+#     - ${{ inputs.surrealdb_strict }}
+#     - ${{ inputs.surrealdb_log }}
+#     - ${{ inputs.surrealdb_additional_args }}
+#   env:
+#     SURREALDB_VERSION: ${{ inputs.surrealdb_version }}
+#     SURREALDB_PORT: ${{ inputs.surrealdb_port }}
 runs:
-  using: "docker"
-  image: "Dockerfile"
-  args:
-    - ${{ inputs.surrealdb_version }}
-    - ${{ inputs.surrealdb_port }}
-    - ${{ inputs.surrealdb_username }}
-    - ${{ inputs.surrealdb_password }}
-    - ${{ inputs.surrealdb_auth }}
-    - ${{ inputs.surrealdb_strict }}
-    - ${{ inputs.surrealdb_log }}
-    - ${{ inputs.surrealdb_additional_args }}
-  env:
-    SURREALDB_VERSION: ${{ inputs.surrealdb_version }}
-    SURREALDB_PORT: ${{ inputs.surrealdb_port }}
+  using: composite
+  steps:
+    - name: Install SurrealDB
+      shell: bash
+      run: |
+        curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
