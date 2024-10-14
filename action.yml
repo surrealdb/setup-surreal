@@ -61,8 +61,8 @@ runs:
       run: |
         cd /usr/local/bin
         nohup surreal start \
-          --u ${{ inputs.surrealdb_username }} \
-          --p ${{ inputs.surrealdb_password }} \
+          -u ${{ inputs.surrealdb_username }} \
+          -p ${{ inputs.surrealdb_password }} \
           --allow-all &
         
     - name: Wait for SurrealDB to start
