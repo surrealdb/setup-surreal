@@ -111,6 +111,16 @@ runs:
         fi
 
         cd /usr/local/bin
+
+        echo nohup surreal start \
+          $SURREALDB_USERNAME \
+          $SURREALDB_PASSWORD \
+          $SURREALDB_AUTH \
+          $SURREALDB_PORT \
+          $SURREALDB_STRICT \
+          $SURREALDB_LOG \
+          $SURREALDB_ADDITIONAL_ARGS \
+          $SURREALDB_ALLOW_ALL &
         
         nohup surreal start \
           $SURREALDB_USERNAME \
@@ -122,15 +132,7 @@ runs:
           $SURREALDB_ADDITIONAL_ARGS \
           $SURREALDB_ALLOW_ALL &
 
-        echo nohup surreal start \
-          $SURREALDB_USERNAME \
-          $SURREALDB_PASSWORD \
-          $SURREALDB_AUTH \
-          $SURREALDB_PORT \
-          $SURREALDB_STRICT \
-          $SURREALDB_LOG \
-          $SURREALDB_ADDITIONAL_ARGS \
-          $SURREALDB_ALLOW_ALL &
+        
         
     - name: Wait for SurrealDB to start
       shell: bash
