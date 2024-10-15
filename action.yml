@@ -34,9 +34,6 @@ inputs:
   surrealdb_additional_args:
     description: "Additional arguments to pass to SurrealDB"
     required: false
-  surrealdb_allow_all:
-    description: "Allow all capabilities except for those more specifically denied"
-    required: false
 
 runs:
   using: composite
@@ -104,12 +101,6 @@ runs:
           SURREALDB_ADDITIONAL_ARGS=""
         fi
 
-        if [ "$SURREALDB_ALLOW_ALL" == "true" ]; then
-          SURREALDB_ALLOW_ALL="--allow-all"
-        else 
-          SURREALDB_ALLOW_ALL=""
-        fi
-
         cd /usr/local/bin
         
         nohup surreal start \
@@ -119,8 +110,7 @@ runs:
           $SURREALDB_PORT \
           $SURREALDB_STRICT \
           $SURREALDB_LOG \
-          $SURREALDB_ADDITIONAL_ARGS \
-          $SURREALDB_ALLOW_ALL &
+          $SURREALDB_ADDITIONAL_ARGS &
 
         
         
