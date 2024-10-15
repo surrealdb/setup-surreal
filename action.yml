@@ -43,7 +43,7 @@ runs:
       shell: bash
       run: |
         # Download the SurrealDB binary when the version is not latest
-        if [ "$SURREALDB_VERSION" == "latest" ]; then
+        if [ "$SURREALDB_VERSION" = "latest" ]; then
           curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s
         else
           curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
@@ -75,14 +75,14 @@ runs:
           SURREALDB_PASSWORD="-p $SURREALDB_PASSWORD"
         fi
 
-        if [[ "$SURREALDB_VERSION" == v1.* ]]; then
+        if [[ "$SURREALDB_VERSION" = v1.* ]]; then
           if [ "$SURREALDB_AUTH" == "true" ]; then
             SURREALDB_AUTH="--auth"
           else
             SURREALDB_AUTH=""
           fi
         else
-          if [ "$SURREALDB_AUTH" == "true" ]; then
+          if [ "$SURREALDB_AUTH" = "true" ]; then
             SURREALDB_AUTH=""
           else
             SURREALDB_AUTH="--unauthenticated"
@@ -95,7 +95,7 @@ runs:
           SURREALDB_PORT="--bind 0.0.0.0:$SURREALDB_PORT"
         fi
 
-        if [ "$SURREALDB_STRICT" == "true" ]; then
+        if [ "$SURREALDB_STRICT" = "true" ]; then
           SURREALDB_STRICT="--strict"
         fi
 
