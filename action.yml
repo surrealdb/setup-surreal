@@ -78,6 +78,8 @@ runs:
         if [[ "$SURREALDB_VERSION" == v1.* ]]; then
           if [ "$SURREALDB_AUTH" == "true" ]; then
             SURREALDB_AUTH="--auth"
+          else
+            SURREALDB_AUTH=""
           fi
         fi
 
