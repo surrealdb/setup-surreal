@@ -47,7 +47,7 @@ runs:
       shell: bash
       run: |
         # Download the SurrealDB binary when the version is not latest
-        if [ "$SURREALDB_VERSION" != "latest" ]; then
+        if [ "$SURREALDB_VERSION" == "latest" ]; then
           curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s
         else
           curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
