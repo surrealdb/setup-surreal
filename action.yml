@@ -102,6 +102,8 @@ runs:
         fi
 
         cd /usr/local/bin
+
+        echo "surrealdb start $SURREALDB_USERNAME $SURREALDB_PASSWORD $SURREALDB_AUTH $SURREALDB_PORT $SURREALDB_STRICT $SURREALDB_LOG $SURREALDB_ADDITIONAL_ARGS"
         
         nohup surreal start \
           $SURREALDB_USERNAME \
