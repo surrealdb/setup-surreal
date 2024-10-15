@@ -86,6 +86,7 @@ runs:
             SURREALDB_AUTH=""
           else
             SURREALDB_AUTH="--unauthenticated"
+          fi
         fi
 
         if [[ -z "$SURREALDB_PORT" ]]; then
