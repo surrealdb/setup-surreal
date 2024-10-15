@@ -37,7 +37,6 @@ inputs:
   surrealdb_allow_all:
     description: "Allow all capabilities except for those more specifically denied"
     required: false
-    default: "false"
 
 runs:
   using: composite
@@ -107,6 +106,8 @@ runs:
 
         if [ "$SURREALDB_ALLOW_ALL" == "true" ]; then
           SURREALDB_ALLOW_ALL="--allow-all"
+        else 
+          SURREALDB_ALLOW_ALL=""
         fi
 
         cd /usr/local/bin
