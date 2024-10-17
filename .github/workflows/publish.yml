@@ -1,0 +1,33 @@
+name: Publish Action
+
+on: 
+  release: 
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      TAG_NAME:
+        description: 'Tag name that the major tag will point to'
+        required: true
+
+env:
+  TAG_NAME: ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }}
+permissions: 
+  contents: write
+
+jobs:
+
+  ci:
+    name: CI Job
+    uses: ./.github/workflows/ci.yml
+
+  update_tag:
+    name: Update the major tag to include the ${{ github.event.inputs.TAG_NAME || github.event.release.tag_name }} changes
+    runs-on: ubuntu-latest
+    needs: [ci]
+    permissions: 
+      contents: write
+    steps:
+      - name: Update the ${{ env.TAG_NAME }} tag
+        uses: actions/publish-action@v0.3.0
+        with:
+          source-tag: ${{ env.TAG_NAME }}

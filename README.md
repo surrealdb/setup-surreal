@@ -44,7 +44,7 @@ jobs:
         surrealdb_auth: false
         surrealdb_strict: false
         surrealdb_log: info
-		surrealdb_additional_args: --allow-all
+        surrealdb_additional_args: --allow-all
 ```
 
 ## License

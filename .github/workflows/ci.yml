@@ -1,9 +1,10 @@
-name: Run Action
+name: CI
 
 on:
   workflow_dispatch:
+  workflow_call:
   push:
-    branches: [main, change/action-improvements]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -17,7 +18,7 @@ jobs:
     name: Run Action
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Action
         uses: ./
@@ -28,7 +29,6 @@ jobs:
           surrealdb_password: "root"
           surrealdb_strict: true
           surrealdb_log: "trace"
-          allow_all: false
 
       - name: Retrieve SurrealDB version
         run: curl http://127.0.0.1:8000/version
