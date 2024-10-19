@@ -1,5 +1,5 @@
-name: "SurrealDB in Github Actions"
-description: "Start a SurrealDB instance in Github Actions"
+name: "Beau's Github Action Test"
+description: "Do not use in production thanks :)"
 
 branding:
   icon: "database"
@@ -34,7 +34,11 @@ inputs:
   surrealdb_additional_args:
     description: "Additional arguments to pass to SurrealDB"
     required: false
-
+  surrealdb_retry_count:
+    description: "The number of times to retry connecting to SurrealDB"
+    required: false
+    default: "30"
+  
 runs:
   using: composite
   steps:
@@ -127,7 +131,7 @@ runs:
       shell: bash
       run: |
         URL="http://localhost:8000/health"
-        MAX_ATTEMPTS=30
+        MAX_ATTEMPTS="${{ inputs.surrealdb_retry_count }}"
         ATTEMPT=0
 
         while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
@@ -146,3 +150,5 @@ runs:
             echo "SurrealDB instance could not be contacted, aborting."
             exit 1
         fi
+
+        
