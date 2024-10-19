@@ -29,6 +29,7 @@ jobs:
           surrealdb_password: "root"
           surrealdb_strict: true
           surrealdb_log: "trace"
+          surrealdb_retry_count: 60
 
       - name: Retrieve SurrealDB version
         run: curl http://127.0.0.1:8000/version
