@@ -7,10 +7,10 @@ on:
         description: Version of the tag
         required: true
       RELEASE_MESSAGE:
-        description: Message for the release
+        description: Release message
         required: false
       RELEASE_TYPE:
-        description: Type of the release
+        description: Release type
         required: false
         type: choice
         default: release
