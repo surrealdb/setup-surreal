@@ -43,6 +43,7 @@ jobs:
           name: Release ${{ github.event.inputs.TAG_VERSION }}
           draft: ${{ github.event.inputs.RELEASE_TYPE == 'draft' }}
           body: ${{ github.event.inputs.RELEASE_MESSAGE }}
+          generateReleaseNotes: true
 
       - name: Update the ${{ env.TAG_VERSION }} tag
         uses: actions/publish-action@v0.3.0
