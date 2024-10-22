@@ -1,4 +1,4 @@
-name: Publish
+name: Draft Release
 
 on:
   workflow_dispatch:
@@ -9,14 +9,6 @@ on:
       RELEASE_MESSAGE:
         description: Release message
         required: false
-      RELEASE_TYPE:
-        description: Release type
-        required: false
-        type: choice
-        default: release
-        options:
-          - draft
-          - release
 
 env:
   TAG_VERSION: ${{ github.event.inputs.TAG_VERSION }}
@@ -41,11 +33,6 @@ jobs:
         with:
           tag: ${{ env.TAG_VERSION }}
           name: Release ${{ github.event.inputs.TAG_VERSION }}
-          draft: ${{ github.event.inputs.RELEASE_TYPE == 'draft' }}
+          draft: true
           body: ${{ github.event.inputs.RELEASE_MESSAGE }}
           generateReleaseNotes: true
-
-      - name: Update the ${{ env.TAG_VERSION }} tag
-        uses: actions/publish-action@v0.3.0
-        with:
-          source-tag: ${{ env.TAG_VERSION }}
