@@ -1,0 +1,51 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      TAG_VERSION:
+        description: Version of the tag
+        required: true
+      RELEASE_MESSAGE:
+        description: Release message
+        required: false
+      RELEASE_TYPE:
+        description: Release type
+        required: false
+        type: choice
+        default: release
+        options:
+          - draft
+          - release
+
+env:
+  TAG_VERSION: ${{ github.event.inputs.TAG_VERSION }}
+permissions: 
+  contents: write
+
+jobs:
+
+  ci:
+    name: CI Job
+    uses: ./.github/workflows/ci.yml
+
+  update_tag:
+    name: Update Tag Job
+    runs-on: ubuntu-latest
+    needs: [ci]
+    permissions: 
+      contents: write
+    steps:
+      - name: Create a release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.TAG_VERSION }}
+          name: Release ${{ github.event.inputs.TAG_VERSION }}
+          draft: ${{ github.event.inputs.RELEASE_TYPE == 'draft' }}
+          body: ${{ github.event.inputs.RELEASE_MESSAGE }}
+          generateReleaseNotes: true
+
+      - name: Update the ${{ env.TAG_VERSION }} tag
+        uses: actions/publish-action@v0.3.0
+        with:
+          source-tag: ${{ env.TAG_VERSION }}

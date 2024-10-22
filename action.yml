@@ -1,5 +1,5 @@
-name: "SurrealDB in Github Actions"
-description: "Start a SurrealDB instance in Github Actions"
+name: "Beau's Github Action Test"
+description: "Do not use in production thanks :)"
 
 branding:
   icon: "database"
@@ -34,16 +34,121 @@ inputs:
   surrealdb_additional_args:
     description: "Additional arguments to pass to SurrealDB"
     required: false
+  surrealdb_retry_count:
+    description: "The number of times to retry connecting to SurrealDB"
+    required: false
+    default: "30"
   
 runs:
- using: "docker"
- image: "DockerFile"
- args:
- - ${{ inputs.surrealdb_version }}
- - ${{ inputs.surrealdb_port }}
- - ${{ inputs.surrealdb_username }}
- - ${{ inputs.surrealdb_password }}
- - ${{ inputs.surrealdb_auth }}
- - ${{ inputs.surrealdb_strict }}
- - ${{ inputs.surrealdb_log }}
- - ${{ inputs.surrealdb_additional_args }}
+  using: composite
+  steps:
+
+    - name: Install SurrealDB
+      shell: bash
+      run: |
+      
+        SURREALDB_VERSION="${{ inputs.surrealdb_version }}"
+      
+        # Download the SurrealDB binary when the version is not latest
+        if [ "$SURREALDB_VERSION" = "latest" ]; then
+          curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh
+        else
+          curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
+        fi
+
+    - name: Run SurrealDB in Background
+      shell: bash
+      run: |
+
+        SURREALDB_VERSION="${{ inputs.surrealdb_version }}"
+        SURREALDB_PORT="${{ inputs.surrealdb_port }}"
+        SURREALDB_USERNAME="${{ inputs.surrealdb_username }}"
+        SURREALDB_PASSWORD="${{ inputs.surrealdb_password }}"
+        SURREALDB_AUTH="${{ inputs.surrealdb_auth }}"
+        SURREALDB_STRICT="${{ inputs.surrealdb_strict }}"
+        SURREALDB_LOG="${{ inputs.surrealdb_log }}"
+        SURREALDB_ADDITIONAL_ARGS="${{ inputs.surrealdb_additional_args }}"
+        SURREALDB_ALLOW_ALL="${{ inputs.surrealdb_allow_all }}"
+
+        if [ -z "$SURREALDB_USERNAME" ]; then
+          SURREALDB_USERNAME="-u root"
+        else
+          SURREALDB_USERNAME="-u $SURREALDB_USERNAME"
+        fi
+
+        if [ -z "$SURREALDB_PASSWORD" ]; then
+          SURREALDB_PASSWORD="-p root"
+        else
+          SURREALDB_PASSWORD="-p $SURREALDB_PASSWORD"
+        fi
+
+        if [[ "$SURREALDB_VERSION" = v1.* ]]; then
+          if [ "$SURREALDB_AUTH" == "true" ]; then
+            SURREALDB_AUTH="--auth"
+          else
+            SURREALDB_AUTH=""
+          fi
+        else
+          if [ "$SURREALDB_AUTH" = "true" ]; then
+            SURREALDB_AUTH=""
+          else
+            SURREALDB_AUTH="--unauthenticated"
+          fi
+        fi
+
+        if [[ -z "$SURREALDB_PORT" ]]; then
+          SURREALDB_PORT="--bind 0.0.0.0:8000"
+        else
+          SURREALDB_PORT="--bind 0.0.0.0:$SURREALDB_PORT"
+        fi
+
+        if [ "$SURREALDB_STRICT" = "true" ]; then
+          SURREALDB_STRICT="--strict"
+        fi
+
+        if [ -z "$SURREALDB_LOG" ]; then
+          SURREALDB_LOG="--log trace"
+        else
+          SURREALDB_LOG="--log $SURREALDB_LOG"
+        fi
+
+        if [ -z "$SURREALDB_ADDITIONAL_ARGS" ]; then
+          SURREALDB_ADDITIONAL_ARGS=""
+        fi
+
+        cd /usr/local/bin
+
+        nohup surreal start \
+          $SURREALDB_USERNAME \
+          $SURREALDB_PASSWORD \
+          $SURREALDB_AUTH \
+          $SURREALDB_PORT \
+          $SURREALDB_STRICT \
+          $SURREALDB_LOG \
+          $SURREALDB_ADDITIONAL_ARGS &
+          
+    - name: Wait for SurrealDB to start
+      shell: bash
+      run: |
+        URL="http://localhost:8000/health"
+        MAX_ATTEMPTS="${{ inputs.surrealdb_retry_count }}"
+        ATTEMPT=0
+
+        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" $URL)
+            
+            if [ "$RESPONSE" -eq 200 ]; then
+                echo "SurrealDB instance is up and running, continuing..."
+                break
+            fi
+            
+            ATTEMPT=$((ATTEMPT + 1))
+            sleep 1
+        done
+
+        if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
+            echo "SurrealDB instance could not be contacted, aborting."
+            exit 1
+        fi
+
+        

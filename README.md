@@ -12,7 +12,7 @@ you provide a value for them.
 
 | Argument                  | Description                        | Default | Value                                                                                |
 | ------------------------- | ---------------------------------- | ------- | ------------------------------------------------------------------------------------ |
-| surrealdb_version         | SurrealDB version to use           | latest  | `latest`, `v1.x.x`                                                                   |
+| surrealdb_version         | SurrealDB version to use           | latest  | `latest`, `v1.x.x`, `v2.x.x`                                                         |
 | surrealdb_port            | Port to run SurrealDB on           | 8000    | Valid number from `0` to `65535`                                                     |
 | surrealdb_username        | Username to use for SurrealDB      |         | Customisable by the user                                                             |
 | surrealdb_password        | Password to use for SurrealDB      |         | Customisable by the user                                                             |
@@ -20,6 +20,7 @@ you provide a value for them.
 | surrealdb_strict          | Enable strict mode                 |         | `true`, `false`                                                                      |
 | surrealdb_log             | Enable logs                        |         | `none`, `full`, `warn`, `info`, `debug`, `trace`                                     |
 | surrealdb_additional_args | Additional arguments for SurrealDB |         | [Any valid SurrealDB CLI arguments](https://surrealdb.com/docs/surrealdb/cli/start#) |
+| surrealdb_retry_count     | Amount of availability retries | 30 | Any valid integer that represent `x` amount of seconds |
 
 ## Usage
 
@@ -35,7 +36,7 @@ jobs:
     - name: Git checkout
       uses: actions/checkout@v2
     - name: Start SurrealDB
-      uses: surrealdb/setup-surreal@v1
+      uses: surrealdb/setup-surreal@v2
       with:
         surrealdb_version: latest
         surrealdb_port: 8000
@@ -44,7 +45,8 @@ jobs:
         surrealdb_auth: false
         surrealdb_strict: false
         surrealdb_log: info
-		surrealdb_additional_args: --allow-all
+        surrealdb_additional_args: --allow-all
+        surrealdb_retry_count: 30
 ```
 
 ## License
