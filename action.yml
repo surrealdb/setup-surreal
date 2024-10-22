@@ -1,5 +1,5 @@
-name: "Beau's Github Action Test"
-description: "Do not use in production thanks :)"
+name: "SurrealDB in Github Action"
+description: "Start a SurrealDB instance in Github Actions"
 
 branding:
   icon: "database"
