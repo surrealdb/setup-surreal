@@ -104,6 +104,8 @@ runs:
 
         if [ "$SURREALDB_STRICT" = "true" ]; then
           SURREALDB_STRICT="--strict"
+        else
+          SURREALDB_STRICT=""
         fi
 
         if [ -z "$SURREALDB_LOG" ]; then
