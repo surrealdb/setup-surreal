@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: Start SurrealDB
       uses: surrealdb/setup-surreal@v2
       with:
