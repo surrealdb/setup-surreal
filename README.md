@@ -49,7 +49,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Start SurrealDB
       id: surrealdb
-      uses: surrealdb/setup-surreal@v2
+      uses: surrealdb/setup-surreal@v3
       with:
         surrealdb_version: latest
         surrealdb_port: 8000
