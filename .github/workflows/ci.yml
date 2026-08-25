@@ -12,25 +12,48 @@ jobs:
   surrealdb-setup:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        surrealdb_version: ["v1.5.5", "v2.0.4", "latest"]
+        surrealdb_version: ["v1.5.6", "v2.6.5", "v3.2.4", "latest", "nightly"]
 
-    name: Run Action
+    name: Run Action (${{ matrix.surrealdb_version }})
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Use Action
+        id: surrealdb
         uses: ./
         with:
           surrealdb_version: ${{ matrix.surrealdb_version }}
-          surrealdb_port: "8000"
+          # Deliberately not the default port, so that the readiness check is
+          # exercised against the port the instance was actually started on
+          surrealdb_port: "8123"
           surrealdb_username: "root"
           surrealdb_password: "root"
           surrealdb_strict: true
-          surrealdb_log: "trace"
+          surrealdb_log: "info"
           surrealdb_retry_count: 60
 
-      - name: Retrieve SurrealDB version
-        run: curl http://127.0.0.1:8000/version
-        continue-on-error: true
+      - name: Check the reported version
+        env:
+          SURREALDB_ENDPOINT: ${{ steps.surrealdb.outputs.endpoint }}
+          SURREALDB_VERSION: ${{ steps.surrealdb.outputs.version }}
+        run: |
+          set -eo pipefail
+          REPORTED=$(curl -sSf "$SURREALDB_ENDPOINT/version")
+          echo "Action installed $SURREALDB_VERSION, instance reports $REPORTED"
+          echo "$REPORTED" | grep -qF "$SURREALDB_VERSION"
+
+      - name: Run a query
+        env:
+          SURREALDB_ENDPOINT: ${{ steps.surrealdb.outputs.endpoint }}
+        run: |
+          set -eo pipefail
+          RESULT=$(curl -sSf -X POST -u root:root \
+            -H "Accept: application/json" \
+            -H "NS: test" -H "DB: test" \
+            -H "surreal-ns: test" -H "surreal-db: test" \
+            "$SURREALDB_ENDPOINT/sql" -d "RETURN 1")
+          echo "$RESULT"
+          echo "$RESULT" | grep -q '"status":"OK"'

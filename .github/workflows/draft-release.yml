@@ -29,7 +29,7 @@ jobs:
       contents: write
     steps:
       - name: Create a release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@40bb172bd05f266cf9ba4ff965cb61e9ee5f6d01 # v1.9.0
         with:
           tag: ${{ env.TAG_VERSION }}
           name: Release ${{ github.event.inputs.TAG_VERSION }}

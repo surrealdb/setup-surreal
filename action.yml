@@ -10,6 +10,9 @@ inputs:
     description: "The version of SurrealDB to use, default is latest"
     required: false
     default: "latest"
+  surrealdb_datastore:
+    description: "The datastore to start SurrealDB with, default is an in-memory datastore"
+    required: false
   surrealdb_port:
     description: "The port to run SurrealDB on, default is 8000"
     required: false
@@ -17,9 +20,11 @@ inputs:
   surrealdb_username:
     description: "The username to use for SurrealDB"
     required: false
+    default: "root"
   surrealdb_password:
     description: "The password to use for SurrealDB"
     required: false
+    default: "root"
   surrealdb_auth:
     description: "Enable authentication for SurrealDB"
     required: false
@@ -31,126 +36,168 @@ inputs:
   surrealdb_log:
     description: "Enable logs printed out in the console."
     required: false
+    default: "trace"
+  surrealdb_import_file:
+    description: "A SurrealQL file to import on startup, requires SurrealDB v3 or later"
+    required: false
   surrealdb_additional_args:
     description: "Additional arguments to pass to SurrealDB"
     required: false
   surrealdb_retry_count:
-    description: "The number of times to retry connecting to SurrealDB"
+    description: "The number of seconds to wait for SurrealDB to become available"
     required: false
     default: "30"
-  
+
+outputs:
+  endpoint:
+    description: "The HTTP endpoint that the SurrealDB instance is listening on"
+    value: ${{ steps.start.outputs.endpoint }}
+  version:
+    description: "The version of SurrealDB that was installed"
+    value: ${{ steps.install.outputs.version }}
+
 runs:
   using: composite
   steps:
 
     - name: Install SurrealDB
+      id: install
       shell: bash
+      env:
+        SURREALDB_VERSION: ${{ inputs.surrealdb_version }}
       run: |
-      
-        SURREALDB_VERSION="${{ inputs.surrealdb_version }}"
-      
-        # Download the SurrealDB binary when the version is not latest
-        if [ "$SURREALDB_VERSION" = "latest" ]; then
-          curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh
-        else
-          curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- --version ${{ inputs.surrealdb_version }}
+        set -eo pipefail
+
+        # Translate the requested version into install script arguments. An
+        # exact version is always prefixed with `v`, matching the release tags.
+        case "$SURREALDB_VERSION" in
+          latest)  INSTALL_ARGS=() ;;
+          nightly) INSTALL_ARGS=(--nightly) ;;
+          beta)    INSTALL_ARGS=(--beta) ;;
+          alpha)   INSTALL_ARGS=(--alpha) ;;
+          v*)      INSTALL_ARGS=(--version "$SURREALDB_VERSION") ;;
+          *)       INSTALL_ARGS=(--version "v$SURREALDB_VERSION") ;;
+        esac
+
+        curl --proto '=https' --tlsv1.2 -sSf https://install.surrealdb.com | sh -s -- "${INSTALL_ARGS[@]}"
+
+        # The arguments accepted by `surreal start` differ between major
+        # versions, so record what was actually installed for later steps.
+        VERSION="$(surreal version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+[^ ]*' | head -n 1)"
+
+        if [ -z "$VERSION" ]; then
+          echo "::error::Unable to determine the installed SurrealDB version"
+          exit 1
         fi
+
+        echo "Installed SurrealDB $VERSION"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        echo "major=${VERSION%%.*}" >> "$GITHUB_OUTPUT"
 
     - name: Run SurrealDB in Background
+      id: start
       shell: bash
+      env:
+        SURREALDB_MAJOR: ${{ steps.install.outputs.major }}
+        SURREALDB_DATASTORE: ${{ inputs.surrealdb_datastore }}
+        SURREALDB_PORT: ${{ inputs.surrealdb_port }}
+        SURREALDB_USERNAME: ${{ inputs.surrealdb_username }}
+        SURREALDB_PASSWORD: ${{ inputs.surrealdb_password }}
+        SURREALDB_AUTH: ${{ inputs.surrealdb_auth }}
+        SURREALDB_STRICT: ${{ inputs.surrealdb_strict }}
+        SURREALDB_LOG: ${{ inputs.surrealdb_log }}
+        SURREALDB_IMPORT_FILE: ${{ inputs.surrealdb_import_file }}
+        SURREALDB_ADDITIONAL_ARGS: ${{ inputs.surrealdb_additional_args }}
       run: |
+        set -eo pipefail
 
-        SURREALDB_VERSION="${{ inputs.surrealdb_version }}"
-        SURREALDB_PORT="${{ inputs.surrealdb_port }}"
-        SURREALDB_USERNAME="${{ inputs.surrealdb_username }}"
-        SURREALDB_PASSWORD="${{ inputs.surrealdb_password }}"
-        SURREALDB_AUTH="${{ inputs.surrealdb_auth }}"
-        SURREALDB_STRICT="${{ inputs.surrealdb_strict }}"
-        SURREALDB_LOG="${{ inputs.surrealdb_log }}"
-        SURREALDB_ADDITIONAL_ARGS="${{ inputs.surrealdb_additional_args }}"
-        SURREALDB_ALLOW_ALL="${{ inputs.surrealdb_allow_all }}"
+        PORT="${SURREALDB_PORT:-8000}"
+        LOG_FILE="${RUNNER_TEMP:-/tmp}/surrealdb.log"
+        PID_FILE="${RUNNER_TEMP:-/tmp}/surrealdb.pid"
 
-        if [ -z "$SURREALDB_USERNAME" ]; then
-          SURREALDB_USERNAME="-u root"
-        else
-          SURREALDB_USERNAME="-u $SURREALDB_USERNAME"
-        fi
+        ARGS=(--bind "0.0.0.0:$PORT")
+        ARGS+=(--username "${SURREALDB_USERNAME:-root}")
+        ARGS+=(--password "${SURREALDB_PASSWORD:-root}")
+        ARGS+=(--log "${SURREALDB_LOG:-trace}")
 
-        if [ -z "$SURREALDB_PASSWORD" ]; then
-          SURREALDB_PASSWORD="-p root"
-        else
-          SURREALDB_PASSWORD="-p $SURREALDB_PASSWORD"
-        fi
-
-        if [[ "$SURREALDB_VERSION" = v1.* ]]; then
-          if [ "$SURREALDB_AUTH" == "true" ]; then
-            SURREALDB_AUTH="--auth"
-          else
-            SURREALDB_AUTH=""
-          fi
-        else
+        # v1 opts in to authentication, later versions opt out of it.
+        if [ "$SURREALDB_MAJOR" -eq 1 ]; then
           if [ "$SURREALDB_AUTH" = "true" ]; then
-            SURREALDB_AUTH=""
-          else
-            SURREALDB_AUTH="--unauthenticated"
+            ARGS+=(--auth)
+          fi
+        else
+          if [ "$SURREALDB_AUTH" != "true" ]; then
+            ARGS+=(--unauthenticated)
           fi
         fi
 
-        if [[ -z "$SURREALDB_PORT" ]]; then
-          SURREALDB_PORT="--bind 0.0.0.0:8000"
-        else
-          SURREALDB_PORT="--bind 0.0.0.0:$SURREALDB_PORT"
-        fi
-
+        # From v3 onwards `--strict` takes an explicit value.
         if [ "$SURREALDB_STRICT" = "true" ]; then
-          SURREALDB_STRICT="--strict"
-        else
-          SURREALDB_STRICT=""
+          if [ "$SURREALDB_MAJOR" -ge 3 ]; then
+            ARGS+=(--strict true)
+          else
+            ARGS+=(--strict)
+          fi
         fi
 
-        if [ -z "$SURREALDB_LOG" ]; then
-          SURREALDB_LOG="--log trace"
-        else
-          SURREALDB_LOG="--log $SURREALDB_LOG"
+        if [ -n "$SURREALDB_IMPORT_FILE" ]; then
+          ARGS+=(--import-file "$SURREALDB_IMPORT_FILE")
         fi
 
-        if [ -z "$SURREALDB_ADDITIONAL_ARGS" ]; then
-          SURREALDB_ADDITIONAL_ARGS=""
+        if [ -n "$SURREALDB_ADDITIONAL_ARGS" ]; then
+          read -ra ADDITIONAL_ARGS <<< "$SURREALDB_ADDITIONAL_ARGS"
+          ARGS+=("${ADDITIONAL_ARGS[@]}")
         fi
 
-        cd /usr/local/bin
+        # The datastore is a positional argument, so it has to come last.
+        if [ -n "$SURREALDB_DATASTORE" ]; then
+          ARGS+=("$SURREALDB_DATASTORE")
+        fi
 
-        nohup surreal start \
-          $SURREALDB_USERNAME \
-          $SURREALDB_PASSWORD \
-          $SURREALDB_AUTH \
-          $SURREALDB_PORT \
-          $SURREALDB_STRICT \
-          $SURREALDB_LOG \
-          $SURREALDB_ADDITIONAL_ARGS &
-          
+        nohup surreal start "${ARGS[@]}" > "$LOG_FILE" 2>&1 &
+        echo $! > "$PID_FILE"
+
+        echo "endpoint=http://127.0.0.1:$PORT" >> "$GITHUB_OUTPUT"
+        echo "log_file=$LOG_FILE" >> "$GITHUB_OUTPUT"
+        echo "pid_file=$PID_FILE" >> "$GITHUB_OUTPUT"
+
     - name: Wait for SurrealDB to start
       shell: bash
+      env:
+        SURREALDB_ENDPOINT: ${{ steps.start.outputs.endpoint }}
+        SURREALDB_LOG_FILE: ${{ steps.start.outputs.log_file }}
+        SURREALDB_PID_FILE: ${{ steps.start.outputs.pid_file }}
+        SURREALDB_RETRY_COUNT: ${{ inputs.surrealdb_retry_count }}
       run: |
-        URL="http://localhost:8000/health"
-        MAX_ATTEMPTS="${{ inputs.surrealdb_retry_count }}"
+        set -eo pipefail
+
+        PID="$(cat "$SURREALDB_PID_FILE")"
+        MAX_ATTEMPTS="${SURREALDB_RETRY_COUNT:-30}"
         ATTEMPT=0
 
-        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-            RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" $URL)
-            
-            if [ "$RESPONSE" -eq 200 ]; then
-                echo "SurrealDB instance is up and running, continuing..."
-                break
-            fi
-            
-            ATTEMPT=$((ATTEMPT + 1))
-            sleep 1
+        while [ "$ATTEMPT" -lt "$MAX_ATTEMPTS" ]; do
+
+          # A server that has already exited is never going to respond.
+          if ! kill -0 "$PID" 2>/dev/null; then
+            echo "::error::SurrealDB exited before it became available"
+            cat "$SURREALDB_LOG_FILE"
+            exit 1
+          fi
+
+          # Curl exits non-zero while nothing is listening yet, which is an
+          # expected outcome here rather than a failure of the step.
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$SURREALDB_ENDPOINT/health" || true)
+
+          if [ "$RESPONSE" = "200" ]; then
+            echo "SurrealDB instance is up and running, continuing..."
+            exit 0
+          fi
+
+          ATTEMPT=$((ATTEMPT + 1))
+          sleep 1
+
         done
 
-        if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
-            echo "SurrealDB instance could not be contacted, aborting."
-            exit 1
-        fi
-
-        
+        echo "::error::SurrealDB instance could not be contacted after ${MAX_ATTEMPTS} seconds, aborting."
+        cat "$SURREALDB_LOG_FILE"
+        exit 1
