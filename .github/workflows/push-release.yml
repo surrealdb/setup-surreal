@@ -21,6 +21,6 @@ jobs:
       contents: write
     steps:
       - name: Update the ${{ github.event.release.tag_name }} tag
-        uses: actions/publish-action@v0.3.0
+        uses: actions/publish-action@23f4c6f12633a2da8f44938b71fde9afec138fb4 # v0.4.0
         with:
           source-tag: ${{ github.event.release.tag_name }}
